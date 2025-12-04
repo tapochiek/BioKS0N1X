@@ -56,15 +56,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-/* 3. 3D НАКЛОН */
+/* 3. 3D НАКЛОН (ОТКЛЮЧЕН НА МОБИЛКАХ) */
 const wrapper = document.querySelector('.tilt-wrapper');
 const container = document.querySelector('.container');
 const constraint = 25; 
 
+// Проверка на мобильное устройство
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
 
 function animateTilt(e) {
-    if (isMobile) return;
+    if (isMobile) return; // Не двигаем на телефоне
 
     const rect = container.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
@@ -144,18 +145,24 @@ changeBgBtn.addEventListener('click', () => {
 });
 
 
-/* 6. ЧАСТИЦЫ */
+/* 6. ЧАСТИЦЫ (ИСПРАВЛЕНИЕ МЫЛА НА ТЕЛЕФОНАХ) */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 let particlesArray;
 
 function resizeCanvas() {
+    // Учитываем плотность пикселей экрана (Retina/Mobile)
     const pixelRatio = window.devicePixelRatio || 1;
     canvas.width = window.innerWidth * pixelRatio;
     canvas.height = window.innerHeight * pixelRatio;
+    
+    // Масштабируем контекст, чтобы рисование было корректным
     ctx.scale(pixelRatio, pixelRatio);
+    
+    // Сбрасываем стили ширины/высоты, чтобы canvas занимал весь экран
     canvas.style.width = window.innerWidth + 'px';
     canvas.style.height = window.innerHeight + 'px';
+    
     init();
 }
 
@@ -171,7 +178,11 @@ class Particle {
     update() {
         this.x += this.speedX;
         this.y += this.speedY;
+        
+        // Уменьшение
         if (this.size > 0.1) this.size -= 0.005;
+        
+        // Если исчезла, пересоздаем
         if (this.size <= 0.1) {
              this.x = Math.random() * window.innerWidth;
              this.y = Math.random() * window.innerHeight;
@@ -188,12 +199,15 @@ class Particle {
 
 function init() {
     particlesArray = [];
+    // Меньше частиц на мобильных для производительности
     const count = isMobile ? 40 : 80;
     for (let i = 0; i < count; i++) particlesArray.push(new Particle());
 }
 
 function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Очищаем с учетом масштаба
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Очистка всего canvas (в пикселях устройства)
+    
     for (let i = 0; i < particlesArray.length; i++) {
         particlesArray[i].update();
         particlesArray[i].draw();
@@ -201,18 +215,8 @@ function animate() {
     requestAnimationFrame(animate);
 }
 
+// Запуск
 resizeCanvas();
 animate();
+
 window.addEventListener('resize', resizeCanvas);
-
-
-/* 7. PRELOADER (СКРЫТИЕ ПОСЛЕ ЗАГРУЗКИ) */
-window.addEventListener('load', () => {
-    const preloader = document.getElementById('preloader');
-    if (preloader) {
-        preloader.style.opacity = '0';
-        setTimeout(() => {
-            preloader.style.display = 'none';
-        }, 500);
-    }
-});
