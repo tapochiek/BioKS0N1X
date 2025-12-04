@@ -16,6 +16,7 @@ const USER_CONFIG = {
         "https://x0.at/PLQ9.jpg"
     ],
     widgetPlayer: {
+        // Трек для верхнего плеера
         audioFile: "https://media.vocaroo.com/mp3/1cZT1do1fGxn", 
         coverArt: "https://x0.at/0wFz.jpg",
         trackName: "Электрослабость — Олений Пенис"
@@ -23,7 +24,7 @@ const USER_CONFIG = {
 };
 
 /* =================================================================
-   ЛОГИКА
+   ЛОГИКА (НЕ МЕНЯТЬ)
    ================================================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -47,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         const containerWidth = document.querySelector('.track-info').clientWidth;
         const textWidth = trackNameEl.scrollWidth;
+        // Если текст длинный, включаем анимацию
         if (textWidth > (containerWidth - 20)) { 
             trackNameEl.classList.add('scrolling');
         } else {
@@ -60,19 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
 const wrapper = document.querySelector('.tilt-wrapper');
 const container = document.querySelector('.container');
 const constraint = 25; 
-
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
 
 function animateTilt(e) {
     if (isMobile) return;
-
     const rect = container.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
-
     let rotateX = -(y / constraint).toFixed(2);
     let rotateY = (x / constraint).toFixed(2);
-
     wrapper.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
 }
 
@@ -87,7 +85,7 @@ container.addEventListener('mousemove', (e) => {
 container.addEventListener('mouseleave', resetTilt);
 
 
-/* 4. ВЕРХНИЙ ПЛЕЕР */
+/* 4. ВЕРХНИЙ ПЛЕЕР (WIDGET) */
 const musicTrigger = document.getElementById('music-trigger');
 const musicBar = document.getElementById('music-player-bar');
 const closePlayerBtn = document.getElementById('close-player-btn');
@@ -206,7 +204,7 @@ animate();
 window.addEventListener('resize', resizeCanvas);
 
 
-/* 7. PRELOADER (СКРЫТИЕ ПОСЛЕ ЗАГРУЗКИ) */
+/* 7. ПРЕЛОАДЕР */
 window.addEventListener('load', () => {
     const preloader = document.getElementById('preloader');
     if (preloader) {
