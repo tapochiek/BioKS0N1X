@@ -16,7 +16,6 @@ const USER_CONFIG = {
         "https://x0.at/PLQ9.jpg"
     ],
     widgetPlayer: {
-        // Трек для верхнего плеера
         audioFile: "https://media.vocaroo.com/mp3/1cZT1do1fGxn", 
         coverArt: "https://x0.at/0wFz.jpg",
         trackName: "Электрослабость — Олений Пенис"
@@ -24,7 +23,7 @@ const USER_CONFIG = {
 };
 
 /* =================================================================
-   ЛОГИКА (НЕ МЕНЯТЬ)
+   ЛОГИКА
    ================================================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -40,28 +39,49 @@ document.addEventListener('DOMContentLoaded', () => {
     tgTextLink.textContent = '@' + tgUsername;
 
     const trackNameEl = document.getElementById('widget-track-name');
-    document.getElementById('bg-music').src = USER_CONFIG.widgetPlayer.audioFile;
+    const audio = document.getElementById('bg-music');
+    const playIcon = document.querySelector('#play-pause-btn i');
+
+    audio.src = USER_CONFIG.widgetPlayer.audioFile;
     document.getElementById('widget-art').src = USER_CONFIG.widgetPlayer.coverArt;
     trackNameEl.textContent = USER_CONFIG.widgetPlayer.trackName;
 
-    // 2. Бегущая строка
+    // 2. Логика бегущей строки (исправленная)
     setTimeout(() => {
         const containerWidth = document.querySelector('.track-info').clientWidth;
         const textWidth = trackNameEl.scrollWidth;
-        // Если текст длинный, включаем анимацию
         if (textWidth > (containerWidth - 20)) { 
             trackNameEl.classList.add('scrolling');
         } else {
             trackNameEl.classList.remove('scrolling');
         }
     }, 100);
+
+    // 3. Автозапуск музыки
+    audio.volume = 0.3;
+    const tryPlay = () => {
+        audio.play().then(() => {
+            playIcon.classList.remove('fa-play');
+            playIcon.classList.add('fa-pause');
+            document.removeEventListener('click', tryPlay);
+            document.removeEventListener('mousemove', tryPlay);
+            document.removeEventListener('touchstart', tryPlay);
+            document.removeEventListener('keydown', tryPlay);
+        }).catch(() => {});
+    };
+    tryPlay();
+    document.addEventListener('click', tryPlay);
+    document.addEventListener('mousemove', tryPlay);
+    document.addEventListener('touchstart', tryPlay);
+    document.addEventListener('keydown', tryPlay);
 });
 
 
-/* 3. 3D НАКЛОН */
+/* 3. 3D НАКЛОН (ОТКЛЮЧЕНИЕ ПРИ ПРОСТОЕ ДЛЯ ЧЕТКОСТИ) */
 const wrapper = document.querySelector('.tilt-wrapper');
 const container = document.querySelector('.container');
 const constraint = 25; 
+
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
 
 function animateTilt(e) {
@@ -76,7 +96,8 @@ function animateTilt(e) {
 
 function resetTilt() {
     if (isMobile) return;
-    wrapper.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+    // Сбрасываем трансформацию полностью, чтобы текст стал четким
+    wrapper.style.transform = 'none';
 }
 
 container.addEventListener('mousemove', (e) => {
@@ -85,7 +106,7 @@ container.addEventListener('mousemove', (e) => {
 container.addEventListener('mouseleave', resetTilt);
 
 
-/* 4. ВЕРХНИЙ ПЛЕЕР (WIDGET) */
+/* 4. УПРАВЛЕНИЕ ПЛЕЕРОМ */
 const musicTrigger = document.getElementById('music-trigger');
 const musicBar = document.getElementById('music-player-bar');
 const closePlayerBtn = document.getElementById('close-player-btn');
@@ -114,7 +135,6 @@ playPauseBtn.addEventListener('click', () => {
     }
 });
 volumeSlider.addEventListener('input', (e) => audio.volume = e.target.value);
-audio.volume = 0.3;
 
 
 /* 5. СМЕНА ФОНА */
@@ -127,7 +147,6 @@ function setBackground(index) {
     bgElement.style.backgroundImage = `url('${bgUrl}')`;
     localStorage.setItem('ks0n1x_bg_index', index);
 }
-
 const savedIndex = localStorage.getItem('ks0n1x_bg_index');
 if (savedIndex !== null) {
     currentBgIndex = parseInt(savedIndex);
