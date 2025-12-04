@@ -2,7 +2,6 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <!-- Важно для мобилок -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KSN1X - Bio</title>
     <link rel="stylesheet" href="style.css">
@@ -11,7 +10,7 @@
 </head>
 <body>
 
-    <!-- ПРЕЛОАДЕР (ЭКРАН ЗАГРУЗКИ) -->
+    <!-- ПРЕЛОАДЕР -->
     <div id="preloader">
         <div class="loader-spinner"></div>
     </div>
@@ -27,6 +26,7 @@
             </div>
             <div class="track-info">
                 <span id="widget-track-name" class="track-name">Loading...</span>
+                <!-- Ссылка на трек -->
                 <a href="https://voca.ro/1cZT1do1fGxn" target="_blank" class="track-link"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
             </div>
             <button id="play-pause-btn" class="control-btn"><i class="fa-solid fa-play"></i></button>
@@ -37,7 +37,7 @@
         </div>
     </div>
 
-    <!-- АУДИО -->
+    <!-- АУДИО ТЕГ -->
     <audio id="bg-music" loop></audio>
 
     <!-- КНОПКА СМЕНЫ ФОНА -->
@@ -75,7 +75,7 @@
                     <div class="bio-item">tg: <a href="#" id="tg-text-link">@loading</a></div>
                     <div class="bio-item">Status: <span class="highlight">Better off dead</span></div>
                 </div>
-                <div class="location"><i class="fa-solid fa-location-dot"></i> Anjme World</div>
+                <div class="location"><i class="fa-solid fa-location-dot"></i> Ukraine, Hell</div>
             </div>
 
             <!-- ССЫЛКИ -->
@@ -99,10 +99,11 @@
                 </a>
             </div>
 
-            <!-- НИЖНИЙ SOUNDCLOUD ПЛЕЕР -->
+            <!-- НИЖНИЙ SOUNDCLOUD ПЛЕЕР (Mzlff) -->
+            <!-- Исправлено: auto_play=false -->
             <div class="music-player glass-panel">
                 <iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" 
-                src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1806751059&color=%23ff003c&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
+                src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1806751059&color=%23ff003c&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
             </div>
 
         </div> <!-- Конец tilt-wrapper -->
