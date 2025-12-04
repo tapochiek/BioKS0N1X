@@ -4,31 +4,23 @@
 * { 
     margin: 0; padding: 0; box-sizing: border-box; 
     font-family: 'Varela Round', sans-serif; 
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+    text-rendering: geometricPrecision;
 }
 
 :root {
-    --primary-color: #ff003c; /* Красный неон */
-    --glass-bg: rgba(15, 15, 15, 0.75);
+    --primary-color: #ff003c;
+    --glass-bg: rgba(12, 12, 12, 0.9);
     --glass-border: rgba(255, 0, 60, 0.4);
     --radius: 20px;
 }
 
-/* --- CUSTOM SCROLLBAR (ПУНКТ 3) --- */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-track {
-    background: #0f0f0f; 
-}
-::-webkit-scrollbar-thumb {
-    background: var(--primary-color); 
-    border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #ff4d73; 
-}
+/* СКРОЛЛБАР */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #0f0f0f; }
+::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #ff4d73; }
 
 body {
     background-color: #0f0f0f;
@@ -40,20 +32,19 @@ body {
     overflow-x: hidden;
 }
 
-/* =========================================
-   ФОН И ЗАТЕМНЕНИЕ
-   ========================================= */
+/* ФОН */
 .bg-image {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background-color: #111; 
     background-position: center; background-size: cover; background-repeat: no-repeat;
     z-index: -2; transition: background-image 0.5s ease;
+    image-rendering: -webkit-optimize-contrast;
 }
 
 .overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.5); 
-    backdrop-filter: blur(6px); 
+    background: rgba(0, 0, 0, 0.4); 
+    backdrop-filter: blur(4px); 
     z-index: -1;
 }
 
@@ -64,19 +55,17 @@ body {
 
 .music-trigger {
     width: 50px; height: 50px; 
-    background: var(--glass-bg); 
+    background: rgba(20, 20, 20, 0.95);
     border: 1px solid var(--glass-border);
     border-radius: 50%; 
     display: flex; justify-content: center; align-items: center; 
     cursor: pointer;
-    backdrop-filter: blur(12px); 
+    backdrop-filter: blur(5px);
     transition: 0.3s; 
     box-shadow: 0 0 15px rgba(255, 0, 60, 0.2);
 }
-
 .music-trigger:hover { transform: scale(1.1); background: rgba(255, 0, 60, 0.2); }
 
-/* Анимация волн */
 .wave-icon { display: flex; align-items: center; gap: 3px; height: 20px; }
 .wave-icon span { width: 3px; height: 100%; background: var(--primary-color); border-radius: 3px; animation: wave 1s infinite ease-in-out; }
 .wave-icon span:nth-child(2) { animation-delay: 0.1s; } 
@@ -84,35 +73,46 @@ body {
 .wave-icon span:nth-child(4) { animation-delay: 0.3s; }
 @keyframes wave { 0%, 100% { height: 20%; } 50% { height: 100%; } }
 
-/* Панель плеера */
 .music-player-bar {
     position: absolute; top: 0; left: 0; height: 50px; width: 0; opacity: 0; pointer-events: none;
-    background: rgba(20, 20, 20, 0.95);
-    backdrop-filter: blur(15px); border: 1px solid var(--glass-border);
+    background: rgba(15, 15, 15, 0.98);
+    border: 1px solid var(--glass-border);
     border-radius: 50px; display: flex; align-items: center; overflow: hidden; padding: 0;
     transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); white-space: nowrap;
 }
 .music-player-bar.active { width: 380px; opacity: 1; pointer-events: all; padding: 0 10px; }
-
 .track-art img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; margin-right: 10px; border: 1px solid var(--primary-color); }
 
-/* --- БЕГУЩАЯ СТРОКА --- */
+/* --- ИСПРАВЛЕННАЯ БЕГУЩАЯ СТРОКА --- */
 .track-info {
     display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: #eee;
-    margin-right: 15px; width: 140px; overflow: hidden; position: relative;
+    margin-right: 15px; 
+    width: 140px; /* Ширина контейнера */
+    overflow: hidden; position: relative;
     mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
     -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
 }
-.track-name { white-space: nowrap; display: inline-block; }
-.track-name.scrolling { animation: scroll-left 8s linear infinite; }
-@keyframes scroll-left {
-    0% { transform: translateX(150px); }
-    100% { transform: translateX(-150%); }
+
+.track-name { 
+    white-space: nowrap; 
+    display: inline-block;
+    transform: translateZ(0); 
 }
+
+/* Скорость анимации - 8 секунд */
+.track-name.scrolling { animation: scroll-left 8s linear infinite; }
+
+@keyframes scroll-left {
+    /* Начинаем ровно от правого края контейнера (140px) */
+    0% { transform: translateX(140px); } 
+    /* Заканчиваем ровно когда текст полностью ушел влево (-100% своей длины) */
+    100% { transform: translateX(-100%); } 
+}
+
 .track-link { 
     color: #888; text-decoration: none; transition: 0.2s; 
     flex-shrink: 0; z-index: 2; padding-left: 5px; 
-    background: rgba(20, 20, 20, 0.95);
+    background: rgba(15, 15, 15, 0.98);
 }
 
 .control-btn { background: none; border: none; color: var(--primary-color); font-size: 1rem; cursor: pointer; margin: 0 5px; }
@@ -120,19 +120,17 @@ body {
 input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; }
 input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: var(--primary-color); }
 
-/* =========================================
-   КНОПКА СМЕНЫ ФОНА
-   ========================================= */
+/* КНОПКА ФОНА */
 .theme-controls { position: fixed; top: 20px; right: 20px; z-index: 100; }
 #change-bg-btn {
-    background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--primary-color);
+    background: rgba(20, 20, 20, 0.9); border: 1px solid var(--glass-border); color: var(--primary-color);
     width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;
     backdrop-filter: blur(5px); transition: all 0.3s ease;
 }
 #change-bg-btn:hover { background: var(--primary-color); color: white; transform: rotate(15deg); }
 
 /* =========================================
-   ОСНОВНОЙ КОНТЕНТ (3D и СТЕКЛО)
+   ОСНОВНОЙ КОНТЕНТ (БЕЗ МЫЛА)
    ========================================= */
 .container { width: 100%; max-width: 700px; padding: 20px; position: relative; z-index: 1; }
 
@@ -141,42 +139,53 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 10px;
     transform-style: preserve-3d;
     transform: perspective(1000px);
     transition: transform 0.1s ease-out;
-    will-change: transform;
 }
 
+/* СТЕКЛЯННЫЕ ПАНЕЛИ */
 .glass-panel {
     background: var(--glass-bg);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     overflow: hidden;
     margin-bottom: 20px;
-    box-shadow: 0 0 20px rgba(255, 0, 60, 0.15);
-    transform: translateZ(20px); 
+    box-shadow: 0 0 20px rgba(255, 0, 60, 0.1);
     image-rendering: -webkit-optimize-contrast;
 }
 
 .banner { width: 100%; height: 180px; overflow: hidden; }
 .banner img { width: 100%; height: 100%; object-fit: cover; }
 .profile-header { text-align: center; margin-top: -60px; padding-bottom: 15px; position: relative; }
-.avatar img { width: 120px; height: 120px; border-radius: 50%; border: 4px solid #1a1a1a; object-fit: cover; box-shadow: 0 0 15px var(--primary-color); transition: 0.3s; }
+.avatar img { 
+    width: 120px; height: 120px; border-radius: 50%; 
+    border: 4px solid #0f0f0f; 
+    object-fit: cover; 
+    box-shadow: 0 0 15px var(--primary-color); 
+    transition: 0.3s; 
+    transform: translateZ(0);
+}
 .avatar img:hover { transform: scale(1.05); }
 
-.username { font-size: 2rem; margin-top: 10px; text-shadow: 0 0 10px var(--primary-color); }
+.username { 
+    font-size: 2rem; margin-top: 10px; 
+    text-shadow: 1px 1px 10px rgba(255, 0, 60, 0.8); 
+    color: #fff;
+    transform: translateZ(0);
+}
 .verify-icon { color: var(--primary-color); font-size: 1.2rem; }
 
 .badges { display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-.badge { background: rgba(255, 0, 60, 0.15); border: 1px solid var(--primary-color); padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; color: #ffccd5; margin-bottom: 5px; }
+.badge { background: rgba(255, 0, 60, 0.1); border: 1px solid var(--primary-color); padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; color: #ffccd5; margin-bottom: 5px; }
 
-.bio-text { padding: 0 30px; text-align: left; margin-top: 20px; font-size: 0.95rem; color: #ddd; }
-.bio-item { background: rgba(255, 255, 255, 0.05); padding: 8px 15px; margin-bottom: 8px; border-radius: 10px; width: fit-content; }
+.bio-text { padding: 0 30px; text-align: left; margin-top: 20px; font-size: 0.95rem; color: #e0e0e0; }
+.bio-item { background: rgba(255, 255, 255, 0.03); padding: 8px 15px; margin-bottom: 8px; border-radius: 10px; width: fit-content; }
 .bio-item a { color: var(--primary-color); text-decoration: none; }
 .location { text-align: center; margin: 20px 0; color: #888; font-size: 0.9rem; }
 .highlight { color: var(--primary-color); }
 
 .links-container { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
 .link-card { display: flex; align-items: center; padding: 15px; text-decoration: none; color: white; transition: 0.3s; margin-bottom: 0; }
-.link-card:hover { background: rgba(255, 0, 60, 0.2); border-color: var(--primary-color); transform: translateZ(30px); }
+.link-card:hover { background: rgba(255, 0, 60, 0.2); border-color: var(--primary-color); }
 .link-icon { width: 40px; height: 40px; border-radius: 10px; overflow: hidden; margin-right: 15px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; background: rgba(0,0,0,0.3); }
 .link-icon img { width: 100%; height: 100%; object-fit: cover; }
 .link-info h3 { font-size: 1rem; margin-bottom: 3px; }
@@ -186,11 +195,10 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 10px;
 .music-player { background: #000; margin-bottom: 0; }
 .footer { text-align: center; margin-top: 30px; font-size: 0.8rem; color: #666; padding-bottom: 20px; transform: translateZ(10px); }
 
+/* CANVAS */
 #canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
 
-/* =========================================
-   МОБИЛЬНАЯ АДАПТАЦИЯ
-   ========================================= */
+/* АДАПТАЦИЯ */
 @media (max-width: 768px) {
     .container { padding: 10px; width: 100%; max-width: 100%; }
     .tilt-wrapper { transform: none !important; perspective: none !important; }
@@ -202,7 +210,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 10px;
     .bio-text { padding: 0 15px; }
 }
 
-/* --- PRELOADER STYLES (ПУНКТ 1) --- */
+/* PRELOADER */
 #preloader {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: #0f0f0f; z-index: 9999;
