@@ -66,13 +66,22 @@ body {
 }
 .music-trigger:hover { transform: scale(1.1); background: rgba(255, 0, 60, 0.2); }
 
-.wave-icon { display: flex; align-items: center; gap: 3px; height: 20px; }
-.wave-icon span { width: 3px; height: 100%; background: var(--primary-color); border-radius: 3px; animation: wave 1s infinite ease-in-out; }
-.wave-icon span:nth-child(2) { animation-delay: 0.1s; } 
-.wave-icon span:nth-child(3) { animation-delay: 0.2s; } 
-.wave-icon span:nth-child(4) { animation-delay: 0.3s; }
-@keyframes wave { 0%, 100% { height: 20%; } 50% { height: 100%; } }
+/* ЭКВАЛАЙЗЕР */
+.wave-icon { 
+    display: flex; 
+    align-items: center; 
+    gap: 3px; 
+    height: 20px; 
+}
+.wave-icon span { 
+    width: 3px; 
+    background: var(--primary-color); 
+    border-radius: 3px; 
+    height: 20%; 
+    transition: height 0.1s ease; 
+}
 
+/* ПЛЕЕР */
 .music-player-bar {
     position: absolute; top: 0; left: 0; height: 50px; width: 0; opacity: 0; pointer-events: none;
     background: rgba(15, 15, 15, 0.98);
@@ -83,38 +92,49 @@ body {
 .music-player-bar.active { width: 380px; opacity: 1; pointer-events: all; padding: 0 10px; }
 .track-art img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; margin-right: 10px; border: 1px solid var(--primary-color); }
 
-/* --- ИСПРАВЛЕННАЯ БЕГУЩАЯ СТРОКА --- */
+
+/* --- ИСПРАВЛЕННАЯ БЕГУЩАЯ СТРОКА (MARQUEE) --- */
 .track-info {
-    display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: #eee;
+    font-size: 0.75rem; color: #eee;
     margin-right: 15px; 
-    width: 140px; /* Ширина контейнера */
-    overflow: hidden; position: relative;
-    mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
-    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+    width: 140px; 
+    overflow: hidden; 
+    position: relative;
+    /* Маска для краев */
+    mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
 }
 
-.track-name { 
-    white-space: nowrap; 
-    display: inline-block;
-    transform: translateZ(0); 
+.marquee-wrapper {
+    display: flex;
+    /* max-content заставляет блок растянуться по ширине текста, 
+       игнорируя ширину родителя. Это критично для правильного расчета процентов. */
+    width: max-content; 
+    animation: marquee-scroll 8s linear infinite;
 }
 
-/* Скорость анимации - 8 секунд */
-.track-name.scrolling { animation: scroll-left 8s linear infinite; }
-
-@keyframes scroll-left {
-    /* Начинаем ровно от правого края контейнера (140px) */
-    0% { transform: translateX(140px); } 
-    /* Заканчиваем ровно когда текст полностью ушел влево (-100% своей длины) */
-    100% { transform: translateX(-100%); } 
+.marquee-wrapper span {
+    /* Добавляем отступ справа. Это и есть наш пробел между повторами */
+    padding-right: 40px; 
+    flex-shrink: 0; /* Запрещаем сжиматься */
 }
+
+@keyframes marquee-scroll {
+    /* Двигаем от 0 */
+    0% { transform: translateX(0); }
+    /* До -50%. Поскольку у нас 2 идентичных куска (Текст+Паддинг), 
+       -50% ширины контейнера — это ровно ширина ОДНОГО куска.
+       В этот момент второй кусок встает ровно на место первого. */
+    100% { transform: translateX(-50%); } 
+}
+/* -------------------------------------------------- */
+
 
 .track-link { 
     color: #888; text-decoration: none; transition: 0.2s; 
     flex-shrink: 0; z-index: 2; padding-left: 5px; 
     background: rgba(15, 15, 15, 0.98);
 }
-
 .control-btn { background: none; border: none; color: var(--primary-color); font-size: 1rem; cursor: pointer; margin: 0 5px; }
 .volume-container { width: 60px; margin: 0 5px; display: flex; align-items: center; }
 input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; }
@@ -130,7 +150,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 10px;
 #change-bg-btn:hover { background: var(--primary-color); color: white; transform: rotate(15deg); }
 
 /* =========================================
-   ОСНОВНОЙ КОНТЕНТ (БЕЗ МЫЛА)
+   ОСНОВНОЙ КОНТЕНТ
    ========================================= */
 .container { width: 100%; max-width: 700px; padding: 20px; position: relative; z-index: 1; }
 
