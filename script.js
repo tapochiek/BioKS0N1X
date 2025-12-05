@@ -38,50 +38,59 @@ document.addEventListener('DOMContentLoaded', () => {
     tgTextLink.href = USER_CONFIG.links.telegram;
     tgTextLink.textContent = '@' + tgUsername;
 
-    const trackNameEl = document.getElementById('widget-track-name');
     const audio = document.getElementById('bg-music');
     const playIcon = document.querySelector('#play-pause-btn i');
-
+    
     audio.src = USER_CONFIG.widgetPlayer.audioFile;
     document.getElementById('widget-art').src = USER_CONFIG.widgetPlayer.coverArt;
-    trackNameEl.textContent = USER_CONFIG.widgetPlayer.trackName;
-
-    // 2. Логика бегущей строки (исправленная)
-    setTimeout(() => {
-        const containerWidth = document.querySelector('.track-info').clientWidth;
-        const textWidth = trackNameEl.scrollWidth;
-        if (textWidth > (containerWidth - 20)) { 
-            trackNameEl.classList.add('scrolling');
-        } else {
-            trackNameEl.classList.remove('scrolling');
-        }
-    }, 100);
-
-    // 3. Автозапуск музыки
     audio.volume = 0.3;
-    const tryPlay = () => {
+
+    // 2. ИСПРАВЛЕННАЯ БЕГУЩАЯ СТРОКА (SEAMLESS LOOP)
+    const marqueeWrapper = document.getElementById('marquee-text');
+    const trackName = USER_CONFIG.widgetPlayer.trackName;
+    
+    // Мы не добавляем пробелы вручную. Отступ сделает CSS (padding-right).
+    // Генерируем 2 идентичных спана.
+    marqueeWrapper.innerHTML = `<span>${trackName}</span><span>${trackName}</span>`;
+
+    // 3. АВТОЗАПУСК МУЗЫКИ
+    const startMusic = () => {
         audio.play().then(() => {
             playIcon.classList.remove('fa-play');
             playIcon.classList.add('fa-pause');
-            document.removeEventListener('click', tryPlay);
-            document.removeEventListener('mousemove', tryPlay);
-            document.removeEventListener('touchstart', tryPlay);
-            document.removeEventListener('keydown', tryPlay);
-        }).catch(() => {});
+            document.removeEventListener('click', startMusic);
+            document.removeEventListener('keydown', startMusic);
+        }).catch(err => {
+            console.log("Autoplay waiting for interaction");
+        });
     };
-    tryPlay();
-    document.addEventListener('click', tryPlay);
-    document.addEventListener('mousemove', tryPlay);
-    document.addEventListener('touchstart', tryPlay);
-    document.addEventListener('keydown', tryPlay);
+
+    startMusic();
+    document.addEventListener('click', startMusic);
+    document.addEventListener('keydown', startMusic);
+
+    // 4. ЖИВОЙ ЭКВАЛАЙЗЕР
+    const bars = document.querySelectorAll('.wave-icon span');
+    
+    function updateVisualizer() {
+        if (!audio.paused) {
+            bars.forEach(bar => {
+                const randomHeight = Math.floor(Math.random() * (100 - 15) + 15);
+                const finalHeight = Math.max(15, randomHeight * (audio.volume + 0.6)); 
+                bar.style.height = `${finalHeight}%`;
+            });
+        } else {
+            bars.forEach(bar => { bar.style.height = '20%'; });
+        }
+    }
+    setInterval(updateVisualizer, 100);
 });
 
 
-/* 3. 3D НАКЛОН (ОТКЛЮЧЕНИЕ ПРИ ПРОСТОЕ ДЛЯ ЧЕТКОСТИ) */
+/* 3D НАКЛОН */
 const wrapper = document.querySelector('.tilt-wrapper');
 const container = document.querySelector('.container');
 const constraint = 25; 
-
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
 
 function animateTilt(e) {
@@ -96,7 +105,6 @@ function animateTilt(e) {
 
 function resetTilt() {
     if (isMobile) return;
-    // Сбрасываем трансформацию полностью, чтобы текст стал четким
     wrapper.style.transform = 'none';
 }
 
@@ -106,7 +114,7 @@ container.addEventListener('mousemove', (e) => {
 container.addEventListener('mouseleave', resetTilt);
 
 
-/* 4. УПРАВЛЕНИЕ ПЛЕЕРОМ */
+/* УПРАВЛЕНИЕ ПЛЕЕРОМ */
 const musicTrigger = document.getElementById('music-trigger');
 const musicBar = document.getElementById('music-player-bar');
 const closePlayerBtn = document.getElementById('close-player-btn');
@@ -137,7 +145,7 @@ playPauseBtn.addEventListener('click', () => {
 volumeSlider.addEventListener('input', (e) => audio.volume = e.target.value);
 
 
-/* 5. СМЕНА ФОНА */
+/* СМЕНА ФОНА */
 let currentBgIndex = 0;
 const bgElement = document.querySelector('.bg-image');
 const changeBgBtn = document.getElementById('change-bg-btn');
@@ -161,7 +169,7 @@ changeBgBtn.addEventListener('click', () => {
 });
 
 
-/* 6. ЧАСТИЦЫ */
+/* ЧАСТИЦЫ */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 let particlesArray;
@@ -223,7 +231,7 @@ animate();
 window.addEventListener('resize', resizeCanvas);
 
 
-/* 7. ПРЕЛОАДЕР */
+/* ПРЕЛОАДЕР */
 window.addEventListener('load', () => {
     const preloader = document.getElementById('preloader');
     if (preloader) {
